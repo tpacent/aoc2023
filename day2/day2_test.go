@@ -28,7 +28,7 @@ func TestSolveDay2Part1(t *testing.T) {
 const Day2Part2Solution = 70924
 
 func TestSolveDay2Part2(t *testing.T) {
-	var actual int // sum of game powers
+	var actual int
 
 	for _, line := range lib.MustReadFile("testdata/input.txt") {
 		game := day2.ParseGame(line)

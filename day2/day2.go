@@ -16,6 +16,7 @@ type GameSummary struct {
 	Rounds []Round
 }
 
+// GetMax returns the number of stones required to play every round in the game
 func (gs *GameSummary) GetMax() (r int, g int, b int) {
 	for _, round := range gs.Rounds {
 		r = max(r, round.Red)
@@ -26,6 +27,7 @@ func (gs *GameSummary) GetMax() (r int, g int, b int) {
 	return
 }
 
+// ParseGame parses a line from input (without using regex)
 func ParseGame(line string) *GameSummary {
 	idStr, roundsStr, ok := strings.Cut(line, ":")
 
@@ -46,6 +48,7 @@ func ParseGame(line string) *GameSummary {
 	return &summary
 }
 
+// parseRound handles strings similar to "1 red, 2 green, 6 blue"
 func parseRound(input string) Round {
 	stats := make(map[string]int)
 
@@ -68,6 +71,7 @@ func parseRound(input string) Round {
 	}
 }
 
+// parseID extracts game id, expects input strings like "Game 1"
 func parseID(input string) int {
 	_, input, ok := strings.Cut(input, " ")
 
@@ -84,6 +88,7 @@ func parseID(input string) int {
 	return id
 }
 
+// IsPlayable tells if the game can be played with the specified number of stones
 func IsPlayable(game *GameSummary, haveRed, haveGreen, haveBlue int) bool {
 	for _, round := range game.Rounds {
 		if round.Red > haveRed || round.Green > haveGreen || round.Blue > haveBlue {
@@ -94,6 +99,7 @@ func IsPlayable(game *GameSummary, haveRed, haveGreen, haveBlue int) bool {
 	return true
 }
 
+// GamePower is defined as numbers of cubes multiplied together
 func GamePower(game *GameSummary) int {
 	r, g, b := game.GetMax()
 	return r * g * b
