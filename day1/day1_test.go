@@ -32,6 +32,10 @@ func TestSolveDay1Part2(t *testing.T) {
 		actual += n
 	}
 
+	if actual != Day1Part2Solution {
+		t.Error("unexpected value")
+	}
+
 	t.Log(actual)
 }
 

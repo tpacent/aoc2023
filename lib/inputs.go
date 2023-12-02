@@ -12,6 +12,7 @@ func MustReadFile(path string) (lines []string) {
 		panic("cannot read input")
 	}
 
+	defer file.Close()
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
