@@ -75,27 +75,32 @@ func CountCards(initialHand []*CardInfo) (total int) {
 	}
 
 	total += len(initialHand)
-	prev := initialHand
+
+	prevHand := make(map[int]int, len(initialHand))
+	for _, card := range initialHand {
+		prevHand[card.ID]++
+	}
 
 	for {
-		hand := make([]*CardInfo, 0)
+		currHand := make(map[int]int, 0)
 
-		for _, card := range prev {
+		for id, copies := range prevHand {
+			card := allCards[id]
 			count := MatchCount(card.Numbers, card.Pile)
 			from := card.ID // off-by-one
 			upto := from + count
-			total += count
+			total += count * copies
 
 			for _, c := range initialHand[from:upto] {
-				hand = append(hand, c)
+				currHand[c.ID] += copies
 			}
 		}
 
-		if len(hand) == 0 {
+		if len(currHand) == 0 {
 			break
 		}
 
-		prev = hand
+		prevHand = currHand
 	}
 
 	return
