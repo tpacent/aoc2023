@@ -11,8 +11,7 @@ const Day4Part1Solution = 17803
 func TestSolveDay4Part1(t *testing.T) {
 	actual := 0
 	for _, line := range lib.MustReadFile("testdata/input.txt") {
-		info := day4.ParseLine(line)
-		actual += day4.CardPoints(day4.MatchCount(info.Numbers, info.Pile))
+		actual += day4.CardPoints(day4.ParseLine(line))
 	}
 	if actual != Day4Part1Solution {
 		t.Error("unexpected value")

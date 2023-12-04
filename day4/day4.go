@@ -18,13 +18,14 @@ func ParseLine(line string) *CardInfo {
 		panic("unexpected input")
 	}
 
+	idstr := cardnum[strings.LastIndex(cardnum, " ")+1:]
 	numstr, pilestr, ok := strings.Cut(line, "|")
 	if !ok {
 		panic("unexpected input")
 	}
 
 	info := &CardInfo{
-		ID:      lib.AsInt(cardnum[strings.LastIndex(cardnum, " ")+1:]),
+		ID:      lib.AsInt(idstr),
 		Numbers: ParseFields(numstr),
 		Pile:    make(map[int]struct{}),
 	}
@@ -44,9 +45,9 @@ func ParseFields(chunk string) (nums []int) {
 	return
 }
 
-func MatchCount(numbers []int, pile map[int]struct{}) (count int) {
-	for _, n := range numbers {
-		if _, ok := pile[n]; ok {
+func MatchCount(card *CardInfo) (count int) {
+	for _, n := range card.Numbers {
+		if _, ok := card.Pile[n]; ok {
 			count++
 		}
 	}
@@ -54,7 +55,9 @@ func MatchCount(numbers []int, pile map[int]struct{}) (count int) {
 	return
 }
 
-func CardPoints(matchCount int) int {
+func CardPoints(card *CardInfo) int {
+	matchCount := MatchCount(card)
+
 	if matchCount == 0 {
 		return 0
 	}
@@ -80,7 +83,7 @@ func CountCards(initialHand []*CardInfo) (total int) {
 
 		for id, copies := range prevHand {
 			card := cardRegistry[id]
-			count := MatchCount(card.Numbers, card.Pile)
+			count := MatchCount(card)
 			from := card.ID // off-by-one
 			upto := from + count
 			total += count * copies
