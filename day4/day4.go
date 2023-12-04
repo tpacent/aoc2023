@@ -14,13 +14,11 @@ type CardInfo struct {
 
 func ParseLine(line string) *CardInfo {
 	cardnum, line, ok := strings.Cut(line, ":")
-
 	if !ok {
 		panic("unexpected input")
 	}
 
 	numstr, pilestr, ok := strings.Cut(line, "|")
-
 	if !ok {
 		panic("unexpected input")
 	}
@@ -46,18 +44,14 @@ func ParseFields(chunk string) (nums []int) {
 	return
 }
 
-func FindMatching(numbers []int, pile map[int]struct{}) (matches []int) {
+func MatchCount(numbers []int, pile map[int]struct{}) (count int) {
 	for _, n := range numbers {
 		if _, ok := pile[n]; ok {
-			matches = append(matches, n)
+			count++
 		}
 	}
 
 	return
-}
-
-func MatchCount(numbers []int, pile map[int]struct{}) int {
-	return len(FindMatching(numbers, pile))
 }
 
 func CardPoints(matchCount int) int {
