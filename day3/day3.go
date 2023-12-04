@@ -3,7 +3,6 @@ package day3
 import (
 	"aoc2023/lib"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -49,11 +48,7 @@ func FindPartNumbers(lines []string) (parts []int) {
 				chunks = append(chunks, lines[index+1][fromIndex:uptoIndex])
 			}
 			if IsPart(chunks) {
-				if n, err := strconv.Atoi(line[match[0]:match[1]]); err == nil {
-					parts = append(parts, n)
-				} else {
-					panic("unreachable")
-				}
+				parts = append(parts, lib.AsInt(line[match[0]:match[1]]))
 			}
 		}
 	}
@@ -69,11 +64,7 @@ func ExtractNumbersAroundGear(lines []string, gearCol, gearRow int) (partNumbers
 		matches := PartNumRe.FindAllStringIndex(line, -1)
 		for _, match := range matches {
 			if intersects(match[0], match[1], fromIndex, uptoIndex) {
-				if n, err := strconv.Atoi(line[match[0]:match[1]]); err == nil {
-					partNumbers = append(partNumbers, n)
-				} else {
-					panic("unreachable")
-				}
+				partNumbers = append(partNumbers, lib.AsInt(line[match[0]:match[1]]))
 			}
 		}
 	}

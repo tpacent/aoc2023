@@ -1,7 +1,7 @@
 package day1
 
 import (
-	"strconv"
+	"aoc2023/lib"
 	"strings"
 )
 
@@ -18,11 +18,7 @@ func MustRecoverValue(s string) int {
 	first := strings.IndexFunc(s, digitFunc)
 	last := strings.LastIndexFunc(s, digitFunc)
 	snumber := string(s[first]) + string(s[last])
-	if n, err := strconv.Atoi(string(snumber)); err == nil {
-		return n
-	}
-
-	panic("unreachable")
+	return lib.AsInt(snumber)
 }
 
 var figures = map[string]int{

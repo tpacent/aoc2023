@@ -1,7 +1,7 @@
 package day2
 
 import (
-	"strconv"
+	"aoc2023/lib"
 	"strings"
 )
 
@@ -59,9 +59,7 @@ func parseRound(input string) Round {
 			panic("unexpected input")
 		}
 
-		if count, err := strconv.Atoi(countstr); err == nil {
-			stats[groupKey] = count
-		}
+		stats[groupKey] = lib.AsInt(countstr)
 	}
 
 	return Round{
@@ -79,13 +77,7 @@ func parseID(input string) int {
 		panic("unexpected input")
 	}
 
-	id, err := strconv.Atoi(input)
-
-	if err != nil {
-		panic("unexpected input")
-	}
-
-	return id
+	return lib.AsInt(input)
 }
 
 // IsPlayable tells if the game can be played with the specified number of stones

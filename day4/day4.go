@@ -69,9 +69,9 @@ func CardPoints(matchCount int) int {
 }
 
 func CountCards(initialHand []*CardInfo) (total int) {
-	allCards := make(map[int]*CardInfo, len(initialHand))
+	cardRegistry := make(map[int]*CardInfo, len(initialHand))
 	for _, card := range initialHand {
-		allCards[card.ID] = card
+		cardRegistry[card.ID] = card
 	}
 
 	total += len(initialHand)
@@ -85,7 +85,7 @@ func CountCards(initialHand []*CardInfo) (total int) {
 		currHand := make(map[int]int, 0)
 
 		for id, copies := range prevHand {
-			card := allCards[id]
+			card := cardRegistry[id]
 			count := MatchCount(card.Numbers, card.Pile)
 			from := card.ID // off-by-one
 			upto := from + count
