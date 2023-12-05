@@ -8,7 +8,7 @@
 
 [Day 4][d4]: [[Part 1][d4p1]] [[Part 2][d4p2]]
 
-[Day 5][d5]: [[Part 1][d4p1]] [Part 2]
+[Day 5][d5]: [[Part 1][d5p1]] [Part 2]
 
 [1]: https://adventofcode.com/2023
 
