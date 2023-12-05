@@ -8,7 +8,7 @@
 
 [Day 4][d4]: [[Part 1][d4p1]] [[Part 2][d4p2]]
 
-[Day 5][d5]: [[Part 1][d5p1]] [Part 2]
+[Day 5][d5]: [[Part 1][d5p1]] [[Part 2][d5p2]]
 
 [1]: https://adventofcode.com/2023
 
@@ -31,3 +31,4 @@
 [d4p2]: https://github.com/tpacent/aoc2023/blob/master/day4/day4_test.go#L24
 
 [d5p1]: https://github.com/tpacent/aoc2023/blob/master/day5/day5_test.go#L12
+[d5p2]: https://github.com/tpacent/aoc2023/blob/master/day5/day5_test.go#L27

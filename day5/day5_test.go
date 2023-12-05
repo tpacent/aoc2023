@@ -22,6 +22,20 @@ func TestSolveDay5Part1(t *testing.T) {
 	t.Log(actual)
 }
 
+const Day5Part2Solution = 12634632
+
+func TestSolveDay5Part2(t *testing.T) {
+	input := lib.MustReadFile("testdata/input.txt")
+	almanac := day5.ParseAlmanac(input)
+	ranges := day5.MakeSeedRanges(almanac.Seeds)
+	for _, rm := range almanac.RangeMappers {
+		ranges = day5.BreakRangeAll(ranges, rm.Mappings)
+	}
+	if actual := ranges[0].Start; actual != Day5Part2Solution {
+		t.Error("unexpected value")
+	}
+}
+
 func TestParseMapping(t *testing.T) {
 	input := "39 0 15"
 	actual := day5.ParseMapping(input)
@@ -70,5 +84,17 @@ func TestAlmanac(t *testing.T) {
 	almanac := day5.ParseAlmanac(input)
 	if len(almanac.RangeMappers) != 7 {
 		t.Error("unexpected mapper count")
+	}
+}
+
+func TestBreakAll(t *testing.T) {
+	input := lib.MustReadFile("testdata/test.txt")
+	almanac := day5.ParseAlmanac(input)
+	ranges := day5.MakeSeedRanges(almanac.Seeds)
+	for _, rm := range almanac.RangeMappers {
+		ranges = day5.BreakRangeAll(ranges, rm.Mappings)
+	}
+	if actual := ranges[0].Start; actual != 46 {
+		t.Error("unexpected value")
 	}
 }

@@ -20,16 +20,16 @@ var MappingsSorter = func(a, b *Mapping) int {
 func NewRangeMapper(mappings []*Mapping, name string) *RangeMapper {
 	m := append([]*Mapping(nil), mappings...)
 	slices.SortFunc(m, MappingsSorter)
-	return &RangeMapper{mappings: m, name: name}
+	return &RangeMapper{Mappings: m, Name: name}
 }
 
 type RangeMapper struct {
-	mappings []*Mapping
-	name     string
+	Mappings []*Mapping
+	Name     string
 }
 
 func (rm *RangeMapper) Map(value int) int {
-	for _, mapper := range rm.mappings {
+	for _, mapper := range rm.Mappings {
 		if mapper.Start > value {
 			break
 		}
@@ -103,3 +103,96 @@ func ParseSeeds(line string) (seeds []int) {
 	}
 	return
 }
+
+func MakeSeedRanges(seeds []int) (out []*Mapping) {
+	for k := 0; k < len(seeds); k += 2 {
+		out = append(out, &Mapping{
+			Start: seeds[k],
+			End:   seeds[k] + seeds[k+1],
+		})
+	}
+
+	return
+}
+
+func BreakRangeAll(a []*Mapping, b []*Mapping) []*Mapping {
+	out := make([]*Mapping, 0)
+
+	for _, ar := range a {
+		addRanges := BreakRange(ar, b)
+
+		if len(addRanges) > 0 {
+			out = append(out, addRanges...)
+		} else {
+			out = append(out, ar)
+		}
+	}
+
+	return SortMergeRange(out)
+}
+
+func SortMergeRange(a []*Mapping) (out []*Mapping) {
+	if len(a) < 2 {
+		return a
+	}
+
+	slices.SortFunc(a, MappingsSorter)
+
+	curr := a[0]
+
+	for _, chunk := range a[1:] {
+		if Intersects(curr, chunk) {
+			curr.End = chunk.End
+		} else {
+			out = append(out, curr)
+			curr = chunk
+		}
+	}
+
+	out = append(out, curr)
+	return
+}
+
+func Intersects(a, b *Mapping) bool {
+	if b.End <= a.Start {
+		return false
+	}
+
+	if b.Start >= a.End {
+		return false
+	}
+
+	return true
+}
+
+func BreakRange(a *Mapping, ranges []*Mapping) []*Mapping {
+	out := make([]*Mapping, 0)
+
+	from := a.Start
+	upto := a.End
+
+	for _, b := range ranges {
+		if b.End <= from {
+			continue
+		}
+		if b.Start >= upto {
+			continue
+		}
+
+		if b.Start > from {
+			out = append(out, &Mapping{Start: from, End: b.Start})
+			from = b.Start
+		}
+
+		tail := min(upto, b.End)
+		out = append(out, &Mapping{Start: from + b.Offset, End: tail + b.Offset})
+		from = tail
+	}
+
+	return out
+}
+
+//      0   4 5   10   15  20  25  30  35  40
+//  A         [----------------]
+//  B   [---]     [----]   [--------]  [---]
+// out: 5..10, 10..15, 15..20, 20..25, 25..30
