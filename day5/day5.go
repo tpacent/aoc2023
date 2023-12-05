@@ -8,14 +8,13 @@ import (
 )
 
 type Mapping struct {
-	Src  int
-	Dst  int
-	Len  int
-	Diff int // TODO may not need this
+	Start  int
+	End    int
+	Offset int
 }
 
 var MappingsSorter = func(a, b *Mapping) int {
-	return cmp.Compare(a.Src, b.Src)
+	return cmp.Compare(a.Start, b.Start)
 }
 
 func NewRangeMapper(mappings []*Mapping, name string) *RangeMapper {
@@ -31,12 +30,12 @@ type RangeMapper struct {
 
 func (rm *RangeMapper) Map(value int) int {
 	for _, mapper := range rm.mappings {
-		if mapper.Src > value {
+		if mapper.Start > value {
 			break
 		}
 
-		if mapper.Src+mapper.Len > value {
-			return value + mapper.Diff
+		if value >= mapper.Start && value < mapper.End {
+			return value + mapper.Offset
 		}
 	}
 
@@ -45,13 +44,14 @@ func (rm *RangeMapper) Map(value int) int {
 
 func ParseMapping(line string) *Mapping {
 	fields := strings.Fields(line)
-	mapping := Mapping{
-		Dst: lib.AsInt(fields[0]),
-		Src: lib.AsInt(fields[1]),
-		Len: lib.AsInt(fields[2]),
+	dst := lib.AsInt(fields[0])
+	src := lib.AsInt(fields[1])
+	len := lib.AsInt(fields[2])
+	return &Mapping{
+		Start:  src,
+		End:    src + len,
+		Offset: dst - src,
 	}
-	mapping.Diff = mapping.Dst - mapping.Src
-	return &mapping
 }
 
 type Almanac struct {

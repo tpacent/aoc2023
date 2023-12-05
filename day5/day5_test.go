@@ -15,7 +15,6 @@ func TestSolveDay5Part1(t *testing.T) {
 	actual := math.MaxInt
 	for _, seed := range almanac.Seeds {
 		actual = min(actual, day5.MapThrough(seed, almanac.RangeMappers))
-
 	}
 	if actual != Day5Part1Solution {
 		t.Error("unexpected value")
@@ -26,14 +25,14 @@ func TestSolveDay5Part1(t *testing.T) {
 func TestParseMapping(t *testing.T) {
 	input := "39 0 15"
 	actual := day5.ParseMapping(input)
-	if actual.Dst != 39 {
-		t.Error("unexpected dst")
+	if actual.Start != 0 {
+		t.Error("unexpected start")
 	}
-	if actual.Src != 0 {
-		t.Error("unexpected src")
+	if actual.End != 15 {
+		t.Error("unexpected end")
 	}
-	if actual.Len != 15 {
-		t.Error("unexpected len")
+	if actual.Offset != 39 {
+		t.Error("unexpected offset")
 	}
 }
 
