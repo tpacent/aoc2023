@@ -30,4 +30,4 @@
 [d4p1]: https://github.com/tpacent/aoc2023/blob/master/day4/day4_test.go#L11
 [d4p2]: https://github.com/tpacent/aoc2023/blob/master/day4/day4_test.go#L24
 
-[d5p1]: https://github.com/tpacent/aoc2023/blob/master/day4/day5_test.go#L12
+[d5p1]: https://github.com/tpacent/aoc2023/blob/master/day5/day5_test.go#L12
