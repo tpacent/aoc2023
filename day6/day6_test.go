@@ -20,6 +20,17 @@ func TestSolveDay6Part1(t *testing.T) {
 	t.Log(actual)
 }
 
+var Day6Part2Solution = 24655068
+
+func TestSolveDay6Part2(t *testing.T) {
+	race := day6.ParseLongRace(lib.MustReadFile("testdata/input.txt"))
+	actual := day6.CountWaysToWin(race)
+	if actual != Day6Part2Solution {
+		t.Error("unexpected value")
+	}
+	t.Log(actual)
+}
+
 var testinput = []string{
 	"Time:      7  15   30",
 	"Distance:  9  40  200",

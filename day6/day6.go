@@ -24,6 +24,15 @@ func ParseRaces(input []string) (races []*RaceInfo) {
 	return
 }
 
+func ParseLongRace(input []string) *RaceInfo {
+	time := strings.Join(strings.Fields(input[0])[1:], "")
+	dist := strings.Join(strings.Fields(input[1])[1:], "")
+	return &RaceInfo{
+		Time:     lib.AsInt(time),
+		Distance: lib.AsInt(dist),
+	}
+}
+
 func CountWaysToWin(race *RaceInfo) (count int) {
 	for hold := 1; hold < race.Time; hold++ {
 		speed := hold
