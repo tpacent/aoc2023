@@ -20,6 +20,19 @@ func TestSolveDay7Part1(t *testing.T) {
 	t.Log(actual)
 }
 
+const SolutionDay7Part2 = 251224870
+
+func TestSolveDay7Part2(t *testing.T) {
+	input := lib.MustReadFile("testdata/input.txt")
+	hands := day7.ParseInput(input)
+	slices.SortFunc(hands, day7.JHandSorter)
+	actual := day7.Winnings(hands)
+	if actual != SolutionDay7Part2 {
+		t.Error("unexpected value")
+	}
+	t.Log(actual)
+}
+
 var testinput = []string{
 	"32T3K 765",
 	"T55J5 684",
@@ -32,6 +45,14 @@ func TestExample(t *testing.T) {
 	hands := day7.ParseInput(testinput)
 	slices.SortFunc(hands, day7.HandSorter)
 	if actual := day7.Winnings(hands); actual != 6440 {
+		t.Error("unexpected value", actual)
+	}
+}
+
+func TestExample2(t *testing.T) {
+	hands := day7.ParseInput(testinput)
+	slices.SortFunc(hands, day7.JHandSorter)
+	if actual := day7.Winnings(hands); actual != 5905 {
 		t.Error("unexpected value", actual)
 	}
 }

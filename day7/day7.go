@@ -19,9 +19,47 @@ const (
 )
 
 type HandInfo struct {
-	Hand []rune
-	Type HandType
-	Bid  int
+	Hand  []rune
+	JHand []rune // hand with jokers applied to maximize value
+	Type  HandType
+	Bid   int
+}
+
+func MaximizeHand(hand []rune) []rune {
+	histogram := make(map[rune]int, len(hand))
+
+	for _, rune := range hand {
+		histogram[rune]++
+	}
+
+	jCount := histogram['J']
+
+	if jCount == 0 {
+		return hand
+	}
+
+	if jCount == len(hand) {
+		return []rune{'A', 'A', 'A', 'A', 'A'}
+	}
+
+	delete(histogram, 'J')
+	var maxRune rune
+	var maxCount int
+	for r, count := range histogram {
+		if count > maxCount {
+			maxCount = count
+			maxRune = r
+		}
+	}
+
+	maxHand := append([]rune(nil), hand...)
+	for k := 0; k < len(maxHand); k++ {
+		if maxHand[k] == 'J' {
+			maxHand[k] = maxRune
+		}
+	}
+
+	return maxHand
 }
 
 func ParseInput(input []string) (hands []*HandInfo) {
@@ -31,7 +69,12 @@ func ParseInput(input []string) (hands []*HandInfo) {
 			panic("unexpected input")
 		}
 		hand := []rune(handstr)
-		hands = append(hands, &HandInfo{Hand: hand, Bid: lib.AsInt(bidstr), Type: GetHandType(hand)})
+		hands = append(hands, &HandInfo{
+			Hand:  hand,
+			Bid:   lib.AsInt(bidstr),
+			Type:  GetHandType(hand),
+			JHand: MaximizeHand(hand),
+		})
 	}
 	return
 }
@@ -50,6 +93,17 @@ var cardStrength = map[rune]int{
 	'4': 4,
 	'3': 3,
 	'2': 2,
+}
+
+func Strength(card rune) int {
+	return cardStrength[card]
+}
+
+func JStrength(card rune) int {
+	if card == 'J' {
+		return 1
+	}
+	return Strength(card)
 }
 
 func GetHandType(hand []rune) HandType {
@@ -95,7 +149,21 @@ func HandSorter(a, b *HandInfo) int {
 	}
 
 	for k := 0; k < len(a.Hand); k++ {
-		if cardCmp := cmp.Compare(cardStrength[a.Hand[k]], cardStrength[b.Hand[k]]); cardCmp != 0 {
+		if cardCmp := cmp.Compare(Strength(a.Hand[k]), Strength(b.Hand[k])); cardCmp != 0 {
+			return cardCmp
+		}
+	}
+
+	return 0
+}
+
+func JHandSorter(a, b *HandInfo) int {
+	if typeCmp := cmp.Compare(GetHandType(a.JHand), GetHandType(b.JHand)); typeCmp != 0 {
+		return typeCmp
+	}
+
+	for k := 0; k < len(a.Hand); k++ {
+		if cardCmp := cmp.Compare(JStrength(a.Hand[k]), JStrength(b.Hand[k])); cardCmp != 0 {
 			return cardCmp
 		}
 	}
