@@ -16,6 +16,8 @@
 
 [Day 8][d8]: [[Part 1][d8p1]] [[Part 2][d8p2]]
 
+[Day 9][d9]: [[Part 1][d9p1]] [[Part 2][d9p2]]
+
 [1]: https://adventofcode.com/2023
 
 [d1]: https://adventofcode.com/2023/day/1
@@ -26,6 +28,7 @@
 [d6]: https://adventofcode.com/2023/day/6
 [d7]: https://adventofcode.com/2023/day/7
 [d8]: https://adventofcode.com/2023/day/8
+[d9]: https://adventofcode.com/2023/day/9
 
 [d1p1]: https://github.com/tpacent/aoc2023/blob/master/day1/day1_test.go#L11
 [d1p2]: https://github.com/tpacent/aoc2023/blob/master/day1/day1_test.go#L27
@@ -50,3 +53,6 @@
 
 [d8p1]: https://github.com/tpacent/aoc2023/blob/master/day8/day8_test.go#L11
 [d8p2]: https://github.com/tpacent/aoc2023/blob/master/day8/day8_test.go#L23
+
+[d9p1]: https://github.com/tpacent/aoc2023/blob/master/day9/day9_test.go#L11
+[d9p2]: https://github.com/tpacent/aoc2023/blob/master/day9/day9_test.go#L24
