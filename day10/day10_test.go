@@ -24,6 +24,8 @@ func TestSolveDay10Part2(t *testing.T) {
 	input := lib.MustReadFileBytes("testdata/input.txt")
 	field := day10.ParseField(input)
 	field.CleanTiles(field.WalkFrom(field.LocateStart()))
+	// gotcha: it may be needed to replace S tile with a mathing pipe
+	// to correctly solve all cases.
 	actual := day10.CountEnclosed(field)
 	if actual != SolutionDay10Part2 {
 		t.Error("unexpected value")
