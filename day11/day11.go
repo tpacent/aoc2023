@@ -54,25 +54,14 @@ func IsEmpty[T comparable](row []T, empty T) bool {
 
 func SumExpandedDistances(coords []*Coords, empties *EmptyInfo, multiplier int) (total int) {
 	for _, pair := range lib.PermuteMofN(coords, 2) {
-		xEmpty := countEmpties(pair[0].X, pair[1].X, empties.Cols)
-		yEmpty := countEmpties(pair[0].Y, pair[1].Y, empties.Rows)
+		xMin, xMax := min(pair[0].X, pair[1].X), max(pair[0].X, pair[1].X)
+		xEmpty := lib.CountMatches(empties.Cols[xMin:xMax], true)
+		yMin, yMax := min(pair[0].Y, pair[1].Y), max(pair[0].Y, pair[1].Y)
+		yEmpty := lib.CountMatches(empties.Rows[yMin:yMax], true)
 		xDist := (lib.Abs(pair[0].X-pair[1].X) - xEmpty) + xEmpty*multiplier
 		yDist := (lib.Abs(pair[0].Y-pair[1].Y) - yEmpty) + yEmpty*multiplier
 		total += xDist + yDist
 	}
-
-	return
-}
-
-func countEmpties(from, upto int, info []bool) (count int) {
-	from, upto = min(from, upto), max(from, upto)
-
-	for k := from; k < upto; k++ {
-		if info[k] {
-			count++
-		}
-	}
-
 	return
 }
 
@@ -93,9 +82,7 @@ func GetEmptyInfo(data [][]byte, empty byte) *EmptyInfo {
 		}
 	}
 
-	data = Transpose(data)
-
-	for index, col := range data {
+	for index, col := range Transpose(data) {
 		if IsEmpty(col, empty) {
 			info.Cols[index] = true
 		}
