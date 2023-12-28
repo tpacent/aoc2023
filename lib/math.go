@@ -41,7 +41,7 @@ func LCM(a, b int, integers ...int) int {
 	return result
 }
 
-func Mod[T constraints.Signed | constraints.Float](value T) T {
+func Abs[T constraints.Signed | constraints.Float](value T) T {
 	if value < 0 {
 		return -1 * value
 	}
