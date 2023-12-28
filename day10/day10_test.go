@@ -11,8 +11,7 @@ var SolutionDay10Part1 = 6838
 func TestSolveDay10Part1(t *testing.T) {
 	input := lib.MustReadFileBytes("testdata/input.txt")
 	field := day10.ParseField(input)
-	steps := field.WalkFrom(field.LocateStart())
-	actual := (steps + 1) / 2 // "farthest" is the middle
+	actual := field.WalkFrom(field.LocateStart()).Size() / 2
 	if actual != SolutionDay10Part1 {
 		t.Error("unexpected value")
 	}
@@ -43,9 +42,9 @@ func TestParse(t *testing.T) {
 		t.Error("unexpected tile")
 	}
 
-	steps := field.WalkFrom(x, y)
+	visitSet := field.WalkFrom(x, y)
 
-	if steps != 7 {
+	if visitSet.Size() != 8 {
 		t.Error("unexpected steps")
 	}
 }

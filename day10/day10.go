@@ -1,6 +1,7 @@
 package day10
 
 import (
+	"aoc2023/lib"
 	"bytes"
 )
 
@@ -101,24 +102,19 @@ func (l *Landscape) PeekTile(x, y int, dir Dir) (int, int, byte) {
 	return x, y, l.SafeTile(x, y)
 }
 
-func (l *Landscape) WalkFrom(x, y int) int {
-	visited := map[int]struct{}{}
-
+func (l *Landscape) WalkFrom(x, y int) lib.Set[int] {
+	visited := make(lib.Set[int])
 	currentTile := l.SafeTile(x, y)
 
-	var moved bool
-	var steps int
-
 	for {
-		moved = false
-		visited[l.TileIndex(x, y)] = struct{}{}
+		moved := false
+		visited.Add(l.TileIndex(x, y))
 
 		for _, dir := range moveDirections {
 			toX, toY, toTile := l.PeekTile(x, y, dir)
 
 			// check visited
-			toIndex := l.TileIndex(toX, toY)
-			if _, ok := visited[toIndex]; ok {
+			if visited.Has(l.TileIndex(toX, toY)) {
 				continue
 			}
 
@@ -128,10 +124,8 @@ func (l *Landscape) WalkFrom(x, y int) int {
 			}
 
 			moved = true
-			x = toX
-			y = toY
+			x, y = toX, toY
 			currentTile = toTile
-			steps++
 			break
 		}
 
@@ -140,7 +134,7 @@ func (l *Landscape) WalkFrom(x, y int) int {
 		}
 	}
 
-	return steps
+	return visited
 }
 
 func ParseField(lines [][]byte) *Landscape {
