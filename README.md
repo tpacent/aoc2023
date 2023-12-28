@@ -66,5 +66,5 @@
 [d10p1]: https://github.com/tpacent/aoc2023/blob/master/day10/day10_test.go#L11
 [d10p2]: https://github.com/tpacent/aoc2023/blob/master/day10/day10_test.go#L23
 
-[d11p1]: https://github.com/tpacent/aoc2023/blob/master/day10/day11_test.go#L11
-[d11p2]: https://github.com/tpacent/aoc2023/blob/master/day10/day11_test.go#L26
+[d11p1]: https://github.com/tpacent/aoc2023/blob/master/day11/day11_test.go#L11
+[d11p2]: https://github.com/tpacent/aoc2023/blob/master/day11/day11_test.go#L26
