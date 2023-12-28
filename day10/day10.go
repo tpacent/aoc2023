@@ -35,6 +35,9 @@ var dirInverse = map[Dir]Dir{
 	DirRight: DirLeft,
 }
 
+var spanHeads = lib.NewSet([]byte{BendF, BendL})
+var spanTails = lib.NewSet([]byte{Bend7, BendJ})
+
 var connectors = map[byte]Dir{
 	None:  DirNone,
 	Start: DirUp | DirDown | DirLeft | DirRight,
@@ -88,6 +91,14 @@ func (l *Landscape) TileIndex(x, y int) int {
 	return y*l.Width + x
 }
 
+func (l *Landscape) CleanTiles(tset lib.Set[int]) {
+	for index := range l.Data {
+		if !tset.Has(index) {
+			l.Data[index] = None
+		}
+	}
+}
+
 func (l *Landscape) PeekTile(x, y int, dir Dir) (int, int, byte) {
 	switch dir {
 	case DirLeft:
@@ -135,6 +146,59 @@ func (l *Landscape) WalkFrom(x, y int) lib.Set[int] {
 	}
 
 	return visited
+}
+
+// A bend is crossable when it does not return where it came from: F--J, L--7
+var xBends = map[byte]byte{
+	BendF: BendJ,
+	BendL: Bend7,
+}
+
+func IsEnclosed(field *Landscape, x, y int) bool {
+	xCount := 0
+	inSpan := false
+	spanStart := None
+
+	for k := 0; k < x; k++ {
+		tile := field.SafeTile(k, y)
+
+		if tile == PipeV {
+			xCount++ // count always
+			continue
+		}
+
+		if inSpan {
+			// end span, test cross condition
+			if spanTails.Has(tile) {
+				inSpan = false
+				if expected, ok := xBends[spanStart]; ok && tile == expected {
+					xCount++
+				}
+			}
+			continue
+		} else {
+			// begin span, save start tile
+			if spanHeads.Has(tile) {
+				inSpan = true
+				spanStart = tile
+				continue
+			}
+		}
+	}
+
+	return xCount%2 > 0
+}
+
+func CountEnclosed(field *Landscape) (count int) {
+	for y := 0; y < field.Height; y++ {
+		for x := 0; x < field.Width; x++ {
+			if field.SafeTile(x, y) == None && IsEnclosed(field, x, y) {
+				count++
+			}
+		}
+	}
+
+	return
 }
 
 func ParseField(lines [][]byte) *Landscape {

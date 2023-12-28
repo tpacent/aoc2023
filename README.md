@@ -18,7 +18,7 @@
 
 [Day 9][d9]: [[Part 1][d9p1]] [[Part 2][d9p2]]
 
-[Day 10][d10]: [[Part 1][d10p1]]
+[Day 10][d10]: [[Part 1][d10p1]] [[Part 2][d10p2]]
 
 [1]: https://adventofcode.com/2023
 
@@ -61,3 +61,4 @@
 [d9p2]: https://github.com/tpacent/aoc2023/blob/master/day9/day9_test.go#L24
 
 [d10p1]: https://github.com/tpacent/aoc2023/blob/master/day10/day10_test.go#L11
+[d10p2]: https://github.com/tpacent/aoc2023/blob/master/day10/day10_test.go#L23
