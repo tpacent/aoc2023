@@ -9,10 +9,15 @@ import (
 const SolutionDay12Part1 = 6935
 
 func TestDay12Part1(t *testing.T) {
-	actual := day12.CountArrangements(lib.MustReadFile("testdata/input.txt"))
+	actual := day12.CountArrangements(lib.MustReadFile("testdata/input.txt"), 1)
 	if actual != SolutionDay12Part1 {
 		t.Error("unexpected value")
 	}
+	t.Log(actual)
+}
+
+func TestDay12Part2(t *testing.T) {
+	actual := day12.CountArrangements(lib.MustReadFile("testdata/input.txt"), 5)
 	t.Log(actual)
 }
 
@@ -35,7 +40,7 @@ func TestArrangements(t *testing.T) {
 	sum := 0
 
 	for _, testcase := range cases {
-		actual := day12.FindArrangements(testcase.Springs, testcase.Groups)
+		actual := day12.FindArrangements(testcase.Springs, testcase.Groups, 0, make(map[string][][]int))
 		if len(actual) != testcase.Expected {
 			t.Error("unexpected value", actual)
 		}
