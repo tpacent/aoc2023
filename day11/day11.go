@@ -29,25 +29,6 @@ func CollectItems[T comparable](data [][]T, item T) (coords []*Coords) {
 	return
 }
 
-func Transpose[T any](data [][]T) [][]T {
-	w := len(data[0])
-	h := len(data)
-
-	out := make([][]T, w)
-
-	for k := 0; k < len(out); k++ {
-		out[k] = make([]T, h)
-	}
-
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			out[x][y] = data[y][x]
-		}
-	}
-
-	return out
-}
-
 func IsEmpty[T comparable](row []T, empty T) bool {
 	return slices.IndexFunc(row, func(value T) bool { return value != empty }) < 0
 }
@@ -82,7 +63,7 @@ func GetEmptyInfo(data [][]byte, empty byte) *EmptyInfo {
 		}
 	}
 
-	for index, col := range Transpose(data) {
+	for index, col := range lib.Transpose(data) {
 		if IsEmpty(col, empty) {
 			info.Cols[index] = true
 		}

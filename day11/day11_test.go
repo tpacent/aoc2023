@@ -42,18 +42,6 @@ var testdata = [][]byte{
 	{9, 10, 0, 12},
 }
 
-func TestTranspose(t *testing.T) {
-	actual := day11.Transpose(testdata)
-
-	if len(actual) != 4 {
-		t.Error("unexpected slice len")
-	}
-
-	if actual[3][2] != 12 {
-		t.Error("unexpected value")
-	}
-}
-
 var sample = [][]byte{
 	[]byte("...#......"),
 	[]byte(".......#.."),
