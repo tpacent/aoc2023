@@ -5,9 +5,11 @@ import (
 	"bytes"
 )
 
-func CheckReflect(input [][]byte, upper, lower int) bool {
+func CheckReflect(input [][]byte, lower int) bool {
+	upper := lower - 1
+
 	for {
-		if upper < 0 || lower > len(input)-1 {
+		if upper < 0 || lower == len(input) {
 			break
 		}
 		if !bytes.Equal(input[upper], input[lower]) {
@@ -22,7 +24,7 @@ func CheckReflect(input [][]byte, upper, lower int) bool {
 
 func FindReflection(input [][]byte) int {
 	for index := 1; index < len(input); index++ {
-		if CheckReflect(input, index-1, index) {
+		if CheckReflect(input, index) {
 			return index
 		}
 	}

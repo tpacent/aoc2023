@@ -3,7 +3,6 @@ package day13_test
 import (
 	"aoc2023/day13"
 	"aoc2023/lib"
-	"bytes"
 	"testing"
 )
 
@@ -28,27 +27,8 @@ var hInput = [][]byte{
 }
 
 func TestData(t *testing.T) {
-	for k := 1; k < len(hInput); k++ {
-		if CheckReflect(hInput, k-1, k) {
-			t.Log("Found", k)
-		}
+	actual := day13.FindReflection(hInput)
+	if actual != 4 {
+		t.Error("unexpected value")
 	}
-
-}
-
-func CheckReflect(input [][]byte, upper, lower int) bool {
-	for {
-		if upper < 0 || lower > len(input)-1 {
-			break
-		}
-
-		if !bytes.Equal(input[upper], input[lower]) {
-			return false
-		}
-
-		upper--
-		lower++
-	}
-
-	return true
 }
