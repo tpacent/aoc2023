@@ -36,18 +36,24 @@ var cases = []*TestCase{
 	{Springs: []byte("?###????????"), Groups: []int{3, 2, 1}, Expected: 10},
 }
 
-func TestArrangements(t *testing.T) {
+func TestNumArrangements(t *testing.T) {
 	sum := 0
 
 	for _, testcase := range cases {
-		actual := day12.FindArrangements(testcase.Springs, testcase.Groups, 0, make(map[string][][]int))
-		if len(actual) != testcase.Expected {
+		actual := day12.NumArrangements(testcase.Springs, testcase.Groups)
+		if actual != testcase.Expected {
 			t.Error("unexpected value", actual)
 		}
-		sum += len(actual)
+		sum += actual
 	}
 
 	if sum != 21 {
 		t.Error("unexpected sum")
 	}
+}
+
+func TestUnfold(t *testing.T) {
+	springs, groups := day12.Unfold([]byte("??????.??..?"), []int{2, 1, 2}, 5)
+	actual := day12.NumArrangements(springs, groups)
+	t.Log(actual)
 }

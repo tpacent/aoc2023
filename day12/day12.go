@@ -4,7 +4,6 @@ import (
 	"aoc2023/lib"
 	"bytes"
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -14,104 +13,77 @@ const (
 	Unknown = '?'
 )
 
-func CacheKey(data []byte, spec []int) string {
-	return string(data) + fmt.Sprintf("%v", spec)
-}
-
-func FindArrangements(data []byte, spec []int, offset int, cache map[string][][]int) (indexes [][]int) {
-	if idxs, ok := cache[CacheKey(data, spec)]; ok {
-		return AddOffsetToIndexes(idxs, offset)
+func NumArrangements(data []byte, spec []int) (total int) {
+	if len(spec) == 0 || len(data) < RequiredSize(spec) {
+		return 0
 	}
 
-	segmentLen, rest := spec[0], spec[1:]
+	slen, rest := spec[0], spec[1:]
+	maxIndex := MaxIndex(data, slen)
 
-	for k := 0; k < len(data)-segmentLen+1; k++ {
-		if !checkSegment(data, k, segmentLen) {
-			continue
+	for index := range data {
+		if index > maxIndex {
+			break
+		}
+
+		if len(data)-index-slen < RequiredSize(rest) {
+			break
+		}
+
+		if !CheckSegment(data, index, slen) {
+			continue // cant use current segment
 		}
 
 		if len(rest) == 0 {
-			indexes = append(indexes, []int{k + offset})
+			if bytes.IndexByte(data[index+slen:], Damaged) < 0 {
+				total++
+			}
 			continue
 		}
 
-		nextSliceIndex := k + segmentLen + 1
-		if nextSliceIndex >= len(data) {
-			continue
-		}
-
-		for _, sub := range FindArrangements(data[nextSliceIndex:], rest, offset+nextSliceIndex, cache) {
-			rec := append([]int{k + offset}, sub...)
-			indexes = append(indexes, rec)
-		}
+		offset := index + slen + 1
+		total += NumArrangements(data[offset:], rest)
 	}
 
-	indexes = FilterValidSolutions(data, spec, AddOffsetToIndexes(indexes, -offset))
-
-	if len(spec) > 1 {
-		cache[CacheKey(data, spec)] = indexes
-	}
-
-	return AddOffsetToIndexes(indexes, offset)
+	return
 }
 
-func AddOffsetToIndexes(indexes [][]int, offset int) [][]int {
-	if len(indexes) == 0 {
-		return indexes
+func RequiredSize(spec []int) int {
+	if len(spec) == 0 {
+		return 0
 	}
 
-	out := make([][]int, 0, len(indexes))
-	for _, idx := range indexes {
-		row := make([]int, 0, len(idx))
-		for _, n := range idx {
-			row = append(row, n+offset)
-		}
-		out = append(out, row)
-	}
-	return out
+	return lib.Sum(spec...) + len(spec) - 1
 }
 
-func checkSegment(data []byte, idx, slen int) bool {
-	// check chunk
+func CheckSegment(data []byte, idx, slen int) bool {
+	// check segment
 	if bytes.IndexByte(data[idx:idx+slen], Empty) >= 0 {
 		return false
 	}
-	// check head
-	if idx > 0 && data[idx-1] == Damaged {
+	// check ahead
+	if idx+slen < len(data) && data[idx+slen] == Damaged {
 		return false
 	}
-	// check tail
-	if idx+slen < len(data) && data[idx+slen] == Damaged {
+	// check behind
+	if idx > 0 && data[idx-1] == Damaged {
 		return false
 	}
 	return true
 }
 
-func FilterValidSolutions(data []byte, spec []int, solutions [][]int) [][]int {
-	valids := make([][]int, 0, len(solutions))
-	for _, s := range solutions {
-		if IsValidSolution(ApplySolution(data, spec, s)) {
-			valids = append(valids, s)
-		}
-	}
-	return valids
-}
-
-func IsValidSolution(data []byte) bool {
-	return bytes.IndexByte(data, Damaged) < 0
-}
-
-func ApplySolution(data []byte, spec []int, solution []int) []byte {
-	out := append([]byte(nil), data...)
-
-	for index, s := range solution {
-		segmentLen := spec[index]
-		for k := s; k < segmentLen+s; k++ {
-			out[k] = Empty
-		}
+func MaxIndex(data []byte, slen int) (index int) {
+	// segment wont fit into data
+	if index = len(data) - slen; index < 0 {
+		return -1
 	}
 
-	return out
+	// scan up to the first damaged cell
+	if dmg := bytes.IndexByte(data, Damaged); dmg >= 0 {
+		index = min(index, dmg)
+	}
+
+	return
 }
 
 func ParseInput(line string) ([]byte, []int) {
@@ -129,11 +101,18 @@ func ParseInput(line string) ([]byte, []int) {
 func CountArrangements(input []string, repeat int) (total int) {
 	for _, line := range input {
 		springs, groups := ParseInput(line)
-		springs = lib.Repeat(springs, repeat)
-		groups = lib.Repeat(groups, repeat)
-		arrangements := FindArrangements(springs, groups, 0, make(map[string][][]int))
-		total += len(arrangements)
+		springs, groups = Unfold(springs, groups, repeat)
+		arrangements := NumArrangements(springs, groups)
+		total += arrangements
 	}
 
 	return
+}
+
+func Unfold(springs []byte, groups []int, times int) ([]byte, []int) {
+	springBox := make([][]byte, 0, times)
+	for k := 0; k < times; k++ {
+		springBox = append(springBox, springs)
+	}
+	return bytes.Join(springBox, []byte{Unknown}), lib.Repeat(groups, times)
 }
