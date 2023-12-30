@@ -16,8 +16,13 @@ func TestDay12Part1(t *testing.T) {
 	t.Log(actual)
 }
 
+const SolutionDay12Part2 = 3920437278260
+
 func TestDay12Part2(t *testing.T) {
 	actual := day12.CountArrangements(lib.MustReadFile("testdata/input.txt"), 5)
+	if actual != SolutionDay12Part2 {
+		t.Error("unexpected value")
+	}
 	t.Log(actual)
 }
 
@@ -40,7 +45,7 @@ func TestNumArrangements(t *testing.T) {
 	sum := 0
 
 	for _, testcase := range cases {
-		actual := day12.NumArrangements(testcase.Springs, testcase.Groups)
+		actual := day12.NumArrangements(testcase.Springs, testcase.Groups, make(map[string]int))
 		if actual != testcase.Expected {
 			t.Error("unexpected value", actual)
 		}
@@ -54,6 +59,6 @@ func TestNumArrangements(t *testing.T) {
 
 func TestUnfold(t *testing.T) {
 	springs, groups := day12.Unfold([]byte("??????.??..?"), []int{2, 1, 2}, 5)
-	actual := day12.NumArrangements(springs, groups)
+	actual := day12.NumArrangements(springs, groups, make(map[string]int))
 	t.Log(actual)
 }

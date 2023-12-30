@@ -4,6 +4,7 @@ import (
 	"aoc2023/lib"
 	"bytes"
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -13,9 +14,17 @@ const (
 	Unknown = '?'
 )
 
-func NumArrangements(data []byte, spec []int) (total int) {
+func cacheKey(data []byte, spec []int) string {
+	return string(data) + fmt.Sprintf("%v", spec)
+}
+
+func NumArrangements(data []byte, spec []int, cache map[string]int) (total int) {
 	if len(spec) == 0 || len(data) < RequiredSize(spec) {
 		return 0
+	}
+
+	if count, ok := cache[cacheKey(data, spec)]; ok {
+		return count
 	}
 
 	slen, rest := spec[0], spec[1:]
@@ -42,9 +51,10 @@ func NumArrangements(data []byte, spec []int) (total int) {
 		}
 
 		offset := index + slen + 1
-		total += NumArrangements(data[offset:], rest)
+		total += NumArrangements(data[offset:], rest, cache)
 	}
 
+	cache[cacheKey(data, spec)] = total
 	return
 }
 
@@ -102,7 +112,7 @@ func CountArrangements(input []string, repeat int) (total int) {
 	for _, line := range input {
 		springs, groups := ParseInput(line)
 		springs, groups = Unfold(springs, groups, repeat)
-		arrangements := NumArrangements(springs, groups)
+		arrangements := NumArrangements(springs, groups, make(map[string]int))
 		total += arrangements
 	}
 
