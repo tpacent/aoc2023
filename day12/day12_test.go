@@ -45,7 +45,7 @@ func TestNumArrangements(t *testing.T) {
 	sum := 0
 
 	for _, testcase := range cases {
-		actual := day12.NumArrangements(testcase.Springs, testcase.Groups, make(map[string]int))
+		actual := day12.NumArrangements(testcase.Springs, testcase.Groups)
 		if actual != testcase.Expected {
 			t.Error("unexpected value", actual)
 		}
@@ -53,12 +53,12 @@ func TestNumArrangements(t *testing.T) {
 	}
 
 	if sum != 21 {
-		t.Error("unexpected sum")
+		t.Error("unexpected sum", sum)
 	}
 }
 
 func TestUnfold(t *testing.T) {
 	springs, groups := day12.Unfold([]byte("??????.??..?"), []int{2, 1, 2}, 5)
-	actual := day12.NumArrangements(springs, groups, make(map[string]int))
+	actual := day12.NumArrangements(springs, groups)
 	t.Log(actual)
 }

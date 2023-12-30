@@ -4,7 +4,7 @@ import (
 	"aoc2023/lib"
 	"bytes"
 	"errors"
-	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -14,11 +14,32 @@ const (
 	Unknown = '?'
 )
 
-func cacheKey(data []byte, spec []int) string {
-	return string(data) + fmt.Sprintf("%v", spec)
+// map key type to elide expensive string operations
+type CKey struct {
+	Data string
+	Spec string
 }
 
-func NumArrangements(data []byte, spec []int, cache map[string]int) (total int) {
+func cacheKey(data []byte, spec []int) CKey {
+	return CKey{Data: string(data), Spec: strints(spec)}
+}
+
+func strints(ints []int) string {
+	sb := strings.Builder{}
+	sb.Grow(len(ints))
+	for _, n := range ints {
+		if _, err := sb.WriteString(strconv.Itoa(n) + " "); err != nil {
+			panic("unexpected err")
+		}
+	}
+	return sb.String()
+}
+
+func NumArrangements(data []byte, spec []int) int {
+	return numArrangements(data, spec, make(map[CKey]int, 64))
+}
+
+func numArrangements(data []byte, spec []int, cache map[CKey]int) (total int) {
 	if len(spec) == 0 || len(data) < RequiredSize(spec) {
 		return 0
 	}
@@ -34,24 +55,22 @@ func NumArrangements(data []byte, spec []int, cache map[string]int) (total int) 
 		if index > maxIndex {
 			break
 		}
-
 		if len(data)-index-slen < RequiredSize(rest) {
 			break
 		}
-
 		if !CheckSegment(data, index, slen) {
 			continue // cant use current segment
 		}
-
 		if len(rest) == 0 {
 			if bytes.IndexByte(data[index+slen:], Damaged) < 0 {
 				total++
 			}
 			continue
 		}
-
-		offset := index + slen + 1
-		total += NumArrangements(data[offset:], rest, cache)
+		// could just use offset := index + slen + 1
+		if offset := FindNextEligibleOffset(data, index+slen+1, rest[0]); offset >= 0 {
+			total += numArrangements(data[offset:], rest, cache)
+		}
 	}
 
 	cache[cacheKey(data, spec)] = total
@@ -59,10 +78,6 @@ func NumArrangements(data []byte, spec []int, cache map[string]int) (total int) 
 }
 
 func RequiredSize(spec []int) int {
-	if len(spec) == 0 {
-		return 0
-	}
-
 	return lib.Sum(spec...) + len(spec) - 1
 }
 
@@ -75,10 +90,6 @@ func CheckSegment(data []byte, idx, slen int) bool {
 	if idx+slen < len(data) && data[idx+slen] == Damaged {
 		return false
 	}
-	// check behind
-	if idx > 0 && data[idx-1] == Damaged {
-		return false
-	}
 	return true
 }
 
@@ -87,12 +98,10 @@ func MaxIndex(data []byte, slen int) (index int) {
 	if index = len(data) - slen; index < 0 {
 		return -1
 	}
-
 	// scan up to the first damaged cell
 	if dmg := bytes.IndexByte(data, Damaged); dmg >= 0 {
 		index = min(index, dmg)
 	}
-
 	return
 }
 
@@ -112,10 +121,9 @@ func CountArrangements(input []string, repeat int) (total int) {
 	for _, line := range input {
 		springs, groups := ParseInput(line)
 		springs, groups = Unfold(springs, groups, repeat)
-		arrangements := NumArrangements(springs, groups, make(map[string]int))
+		arrangements := NumArrangements(springs, groups)
 		total += arrangements
 	}
-
 	return
 }
 
@@ -125,4 +133,46 @@ func Unfold(springs []byte, groups []int, times int) ([]byte, []int) {
 		springBox = append(springBox, springs)
 	}
 	return bytes.Join(springBox, []byte{Unknown}), lib.Repeat(groups, times)
+}
+
+// FindNextEligibleOffset is an unnecessary cache optimization
+func FindNextEligibleOffset(data []byte, offset, slen int) int {
+	var (
+		seq     int
+		seenDmg bool
+		datalen = len(data)
+	)
+
+	if datalen < slen {
+		return -1
+	}
+
+	for {
+		if offset >= datalen {
+			break
+		}
+
+		if data[offset] == Empty {
+			if seenDmg {
+				break
+			}
+			seq = 0
+			offset++
+			continue
+		}
+
+		seq++
+
+		if seq >= slen {
+			return offset - seq + 1
+		}
+
+		if data[offset] == Damaged {
+			seenDmg = true
+		}
+
+		offset++
+	}
+
+	return -1
 }
