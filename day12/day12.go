@@ -3,8 +3,8 @@ package day12
 import (
 	"aoc2023/lib"
 	"bytes"
+	"encoding/binary"
 	"errors"
-	"strconv"
 	"strings"
 )
 
@@ -14,32 +14,20 @@ const (
 	Unknown = '?'
 )
 
-// map key type to elide expensive string operations
-type CKey struct {
-	Data string
-	Spec string
-}
-
-func cacheKey(data []byte, spec []int) CKey {
-	return CKey{Data: string(data), Spec: strints(spec)}
-}
-
-func strints(ints []int) string {
-	sb := strings.Builder{}
-	sb.Grow(len(ints))
-	for _, n := range ints {
-		if _, err := sb.WriteString(strconv.Itoa(n) + " "); err != nil {
-			panic("unexpected err")
-		}
+func cacheKey(data []byte, spec []int) string {
+	buf := make([]byte, 0, len(data)+len(spec))
+	buf = append(buf, data...)
+	for _, n := range spec {
+		buf = binary.AppendVarint(buf, int64(n))
 	}
-	return sb.String()
+	return string(buf)
 }
 
 func NumArrangements(data []byte, spec []int) int {
-	return numArrangements(data, spec, make(map[CKey]int, 64))
+	return numArrangements(data, spec, make(map[string]int, 64))
 }
 
-func numArrangements(data []byte, spec []int, cache map[CKey]int) (total int) {
+func numArrangements(data []byte, spec []int, cache map[string]int) (total int) {
 	if len(spec) == 0 || len(data) < RequiredSize(spec) {
 		return 0
 	}
