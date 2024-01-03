@@ -18,6 +18,17 @@ func TestSolveDay14Part1(t *testing.T) {
 	t.Log(actual)
 }
 
+const SolutionDay14Part2 = 90928
+
+func TestSolveDay14Part2(t *testing.T) {
+	data := lib.MustReadFileBytes("testdata/input.txt")
+	actual := day14.LoadAtIteration(lib.RotateCW(data), 1_000_000_000)
+	if actual != SolutionDay14Part2 {
+		t.Error("unexpected value")
+	}
+	t.Log(actual)
+}
+
 func TestFindAllIndex(t *testing.T) {
 	data := []byte("00...0....0..00")
 	expected := []int{0, 1, 5, 10, 13, 14}
@@ -49,9 +60,22 @@ func TestRotateClockwise(t *testing.T) {
 	t.Log(actual)
 }
 
+func TestRotateCounterClockwise(t *testing.T) {
+	actual := lib.RotateCCW(sampledata)
+	t.Log(actual)
+}
+
 func TestLoad(t *testing.T) {
 	rolled := day14.RollStonesRight(lib.RotateCW(sampledata))
 	if actual := day14.CalcLoad(rolled); actual != 136 {
 		t.Log("unexpected value")
+	}
+}
+
+func TestPart2(t *testing.T) {
+	data := lib.RotateCW(sampledata)
+	actual := day14.LoadAtIteration(data, 1_000_000_000)
+	if actual != 64 {
+		t.Error("unexpected value")
 	}
 }

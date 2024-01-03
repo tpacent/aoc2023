@@ -1,7 +1,9 @@
 package day14
 
 import (
+	"aoc2023/lib"
 	"bytes"
+	"hash/crc64"
 	"slices"
 )
 
@@ -64,4 +66,46 @@ func CalcLoad(data [][]byte) (load int) {
 	}
 
 	return
+}
+
+func HashData(data [][]byte) uint64 {
+	checksum := crc64.New(crc64.MakeTable(crc64.ECMA))
+	for _, row := range data {
+		if _, err := checksum.Write(row); err != nil {
+			panic(err)
+		}
+	}
+	return checksum.Sum64()
+}
+
+func LoadAtIteration(data [][]byte, iterations int) int {
+	hashIndexes := make(map[uint64]int)
+	var loopOffset int
+	var loopSize int
+	var loads = make([]int, 0)
+
+	for k := 0; k < iterations; k++ {
+		loads = append(loads, CalcLoad(data))
+
+		key := HashData(data)
+		if index, ok := hashIndexes[key]; ok {
+			loopOffset = index
+			loopSize = k - index
+			break
+		} else {
+			hashIndexes[key] = k
+		}
+
+		data = RollStonesRight(data)
+		data = lib.RotateCW(data)
+		data = RollStonesRight(data)
+		data = lib.RotateCW(data)
+		data = RollStonesRight(data)
+		data = lib.RotateCW(data)
+		data = RollStonesRight(data)
+		data = lib.RotateCW(data)
+	}
+
+	index := (iterations - loopOffset) % loopSize
+	return loads[loopOffset:][index]
 }
