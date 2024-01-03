@@ -15,7 +15,7 @@ type HashMap [256][]Lens
 
 func (hm *HashMap) OpUpsert(lens Lens) {
 	bucket := Hash([]byte(lens.Label))
-	itemIndex := slices.IndexFunc(hm[bucket], func(l Lens) bool { return l.Label == lens.Label })
+	itemIndex := labelIndex(hm[bucket], lens.Label)
 	if itemIndex < 0 {
 		hm[bucket] = append(hm[bucket], lens)
 	} else {
@@ -42,7 +42,6 @@ func (hm *HashMap) Power() (total int) {
 			total += (1 + bucketIndex) * (1 + lensIndex) * int(lens.Power)
 		}
 	}
-
 	return
 }
 
@@ -70,6 +69,5 @@ func SumHashes(line []byte) (sum int) {
 	for _, str := range bytes.Split(line, []byte{','}) {
 		sum += int(Hash(str))
 	}
-
 	return
 }
