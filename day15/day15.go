@@ -14,22 +14,26 @@ type Lens struct {
 type HashMap [256][]Lens
 
 func (hm *HashMap) OpUpsert(lens Lens) {
-	box := Hash([]byte(lens.Label))
-	itemIndex := slices.IndexFunc(hm[box], func(l Lens) bool { return l.Label == lens.Label })
+	bucket := Hash([]byte(lens.Label))
+	itemIndex := slices.IndexFunc(hm[bucket], func(l Lens) bool { return l.Label == lens.Label })
 	if itemIndex < 0 {
-		hm[box] = append(hm[box], lens)
+		hm[bucket] = append(hm[bucket], lens)
 	} else {
-		hm[box][itemIndex] = lens
+		hm[bucket][itemIndex] = lens
 	}
 }
 
 func (hm *HashMap) OpRemove(label []byte) {
-	box := Hash(label)
-	itemIndex := slices.IndexFunc(hm[box], func(l Lens) bool { return l.Label == string(label) })
+	bucket := Hash(label)
+	itemIndex := labelIndex(hm[bucket], string(label))
 	if itemIndex < 0 {
 		return
 	}
-	hm[box] = slices.Delete(hm[box], itemIndex, itemIndex+1)
+	hm[bucket] = slices.Delete(hm[bucket], itemIndex, itemIndex+1)
+}
+
+func labelIndex(lens []Lens, label string) int {
+	return slices.IndexFunc(lens, func(l Lens) bool { return l.Label == string(label) })
 }
 
 func (hm *HashMap) Power() (total int) {
