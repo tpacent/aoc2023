@@ -60,11 +60,6 @@ func TestRotateClockwise(t *testing.T) {
 	t.Log(actual)
 }
 
-func TestRotateCounterClockwise(t *testing.T) {
-	actual := lib.RotateCCW(sampledata)
-	t.Log(actual)
-}
-
 func TestLoad(t *testing.T) {
 	rolled := day14.RollStonesRight(lib.RotateCW(sampledata))
 	if actual := day14.CalcLoad(rolled); actual != 136 {

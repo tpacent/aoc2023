@@ -2,7 +2,6 @@ package day14
 
 import (
 	"aoc2023/lib"
-	"bytes"
 	"hash/crc64"
 	"slices"
 )
@@ -12,8 +11,8 @@ const RoundStone byte = 'O'
 const EmptyTile byte = '.'
 
 func RollStonesRight(data [][]byte) [][]byte {
-	for index := range data {
-		RollRow(data[index])
+	for _, row := range data {
+		RollRow(row)
 	}
 	return data
 }
@@ -40,31 +39,24 @@ func RunLength(vec []byte, needle byte) (runlen int) {
 	return
 }
 
-func FindAllIndex(vec []byte, needle byte) (indexes []int) {
-	cursor := 0
-
-	for {
-		if cursor >= len(vec) {
-			break
+func FindAllIndex(vec []byte, needle byte) []int {
+	indexes := make([]int, 0, 32)
+	for index, value := range vec {
+		if value == needle {
+			indexes = append(indexes, index)
 		}
-		index := bytes.IndexByte(vec[cursor:], needle)
-		if index < 0 {
-			break
-		}
-		indexes = append(indexes, cursor+index)
-		cursor += index + 1
 	}
-
-	return
+	return indexes
 }
 
 func CalcLoad(data [][]byte) (load int) {
 	for _, row := range data {
-		for _, index := range FindAllIndex(row, RoundStone) {
-			load += index + 1
+		for index, value := range row {
+			if value == RoundStone {
+				load += index + 1
+			}
 		}
 	}
-
 	return
 }
 
@@ -107,5 +99,5 @@ func LoadAtIteration(data [][]byte, iterations int) int {
 	}
 
 	index := (iterations - loopOffset) % loopSize
-	return loads[loopOffset:][index]
+	return loads[index+loopOffset]
 }
