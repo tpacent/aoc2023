@@ -2,7 +2,6 @@ package day16
 
 import (
 	"aoc2023/lib"
-	"encoding/binary"
 )
 
 const (
@@ -19,14 +18,11 @@ type BeamState struct {
 	Dir uint8
 }
 
-type VisitMap map[string]map[uint8]struct{}
+type VisitMap map[uint16]map[uint8]struct{}
 
-func (vm VisitMap) Visit(beam *BeamState) (visited bool) {
-	buf := make([]byte, 0, 20)
-	buf = binary.AppendUvarint(buf, uint64(beam.X))
-	buf = binary.AppendUvarint(buf, uint64(beam.Y))
-	dirstore, ok := vm[string(buf)]
-
+func (vm VisitMap) Visit(beam BeamState) (visited bool) {
+	key := KeyFunc(beam.X, beam.Y)
+	dirstore, ok := vm[key]
 	if ok {
 		// check if dir was already visited
 		if _, visited := dirstore[beam.Dir]; visited {
@@ -35,9 +31,15 @@ func (vm VisitMap) Visit(beam *BeamState) (visited bool) {
 		dirstore[beam.Dir] = struct{}{}
 		return
 	}
-
-	vm[string(buf)] = map[uint8]struct{}{beam.Dir: {}}
+	store := make(map[uint8]struct{}, 4)
+	store[beam.Dir] = struct{}{}
+	vm[key] = store
 	return
+}
+
+// KeyFunc works for coordinates up to 256
+func KeyFunc(x, y int) uint16 {
+	return uint16(x)<<8 | uint16(y)
 }
 
 func CreateGrid(input [][]byte) *lib.Grid[byte] {
@@ -55,34 +57,30 @@ func CreateGrid(input [][]byte) *lib.Grid[byte] {
 func FindMaxVisits(input [][]byte) (maxVisits int) {
 	w := len(input[0])
 	h := len(input)
-
 	grid := CreateGrid(input)
-
 	for x := 0; x < w; x++ {
 		maxVisits = max(
 			maxVisits,
-			len(TracePath(grid, &BeamState{X: x, Y: 0, Dir: DirSouth})),
-			len(TracePath(grid, &BeamState{X: x, Y: h - 1, Dir: DirNorth})),
+			len(TracePath(grid, BeamState{X: x, Y: 0, Dir: DirSouth})),
+			len(TracePath(grid, BeamState{X: x, Y: h - 1, Dir: DirNorth})),
 		)
 	}
-
 	for y := 0; y < h; y++ {
 		maxVisits = max(
 			maxVisits,
-			len(TracePath(grid, &BeamState{X: 0, Y: y, Dir: DirEast})),
-			len(TracePath(grid, &BeamState{X: w - 1, Y: y, Dir: DirWest})),
+			len(TracePath(grid, BeamState{X: 0, Y: y, Dir: DirEast})),
+			len(TracePath(grid, BeamState{X: w - 1, Y: y, Dir: DirWest})),
 		)
 	}
-
 	return
 }
 
-func TracePath(grid *lib.Grid[byte], seed *BeamState) VisitMap {
-	visited := make(VisitMap)
-	beams := []*BeamState{seed}
+func TracePath(grid *lib.Grid[byte], seed BeamState) VisitMap {
+	visited := make(VisitMap, grid.Len())
+	beams := []BeamState{seed}
 
 	for {
-		newStates := make([]*BeamState, 0)
+		newStates := make([]BeamState, 0)
 
 		for _, beam := range beams {
 			tile, err := grid.Get(beam.X, beam.Y)
@@ -134,31 +132,28 @@ var nextDirections = map[uint8]map[byte][]uint8{
 	},
 }
 
-func ProcessTile(beam *BeamState, tile byte) (states []*BeamState) {
+func ProcessTile(beam BeamState, tile byte) []BeamState {
 	nextDirs, ok := nextDirections[beam.Dir][tile]
-
 	if !ok {
-		return []*BeamState{beam} // keep going
+		return []BeamState{beam} // keep going
 	}
-
+	states := make([]BeamState, 0, 2)
 	for _, next := range nextDirs {
-		states = append(states, &BeamState{Dir: next, X: beam.X, Y: beam.Y})
+		states = append(states, BeamState{Dir: next, X: beam.X, Y: beam.Y})
 	}
-
-	return
+	return states
 }
 
-func NextState(beam *BeamState) *BeamState {
-	state := BeamState{Dir: beam.Dir, X: beam.X, Y: beam.Y}
+func NextState(beam BeamState) BeamState {
 	switch beam.Dir {
 	case DirNorth:
-		state.Y--
+		beam.Y--
 	case DirSouth:
-		state.Y++
+		beam.Y++
 	case DirWest:
-		state.X--
+		beam.X--
 	case DirEast:
-		state.X++
+		beam.X++
 	}
-	return &state
+	return beam
 }

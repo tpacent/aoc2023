@@ -20,6 +20,10 @@ type Grid[T any] struct {
 	zero T // cached helper value to return in case of error
 }
 
+func (grid *Grid[T]) Len() int {
+	return len(grid.data)
+}
+
 // Get returns a value at specified coordinates
 func (grid *Grid[T]) Get(coords ...int) (T, error) {
 	index, err := grid.Index(coords...)
