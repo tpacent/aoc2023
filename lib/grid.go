@@ -44,8 +44,10 @@ func (grid *Grid[T]) Index(coords ...int) (index int, err error) {
 	if err = grid.validateCoords(coords...); err != nil {
 		return
 	}
+	planeSize := 1
 	for dIndex, dValue := range coords {
-		index += dValue * Mul(grid.dims[:dIndex]...)
+		index += dValue * planeSize
+		planeSize *= grid.dims[dIndex]
 	}
 	return
 }
@@ -56,10 +58,11 @@ func (grid *Grid[T]) Coords(index int) ([]int, error) {
 		return nil, err
 	}
 	coords := make([]int, len(grid.dims))
+	planeSize := len(grid.data)
 	// most significant coordinate last,
 	// as in: x, y, z.
 	for k := len(grid.dims) - 1; k > -1; k-- {
-		planeSize := Mul(grid.dims[:k]...)
+		planeSize /= grid.dims[k]
 		coords[k] = index / planeSize
 		index -= coords[k] * planeSize
 	}

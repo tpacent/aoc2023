@@ -29,7 +29,7 @@ func TestGrid(t *testing.T) {
 		}
 
 		if !slices.Equal(actual, []int{2, 1, 2}) {
-			t.Error("unexpected value")
+			t.Error("unexpected value", actual)
 		}
 	}
 }
