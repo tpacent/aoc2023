@@ -52,11 +52,34 @@ func CreateGrid(input [][]byte) *lib.Grid[byte] {
 	return grid
 }
 
-func TracePath(input [][]byte) VisitMap {
-	grid := CreateGrid(input)
-	visited := make(VisitMap)
+func FindMaxVisits(input [][]byte) (maxVisits int) {
+	w := len(input[0])
+	h := len(input)
 
-	beams := []*BeamState{{X: 0, Y: 0, Dir: DirEast}}
+	grid := CreateGrid(input)
+
+	for x := 0; x < w; x++ {
+		maxVisits = max(
+			maxVisits,
+			len(TracePath(grid, &BeamState{X: x, Y: 0, Dir: DirSouth})),
+			len(TracePath(grid, &BeamState{X: x, Y: h - 1, Dir: DirNorth})),
+		)
+	}
+
+	for y := 0; y < h; y++ {
+		maxVisits = max(
+			maxVisits,
+			len(TracePath(grid, &BeamState{X: 0, Y: y, Dir: DirEast})),
+			len(TracePath(grid, &BeamState{X: w - 1, Y: y, Dir: DirWest})),
+		)
+	}
+
+	return
+}
+
+func TracePath(grid *lib.Grid[byte], seed *BeamState) VisitMap {
+	visited := make(VisitMap)
+	beams := []*BeamState{seed}
 
 	for {
 		newStates := make([]*BeamState, 0)
